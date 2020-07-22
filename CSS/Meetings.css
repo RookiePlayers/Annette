@@ -1,0 +1,224 @@
+body{
+    width:100%;
+    height:100%;
+}
+.meetings{
+    width:100%;
+    height:100vh;
+
+}
+.mapArea{
+    width: 70%;
+    height:100vh;
+
+}
+.journey-div{
+
+bottom: 0;
+    z-index: 1000;
+    position: absolute; 
+    width: 70%;
+   
+}
+.journey-div-inner{
+    width: 100%;
+   
+    position: relative;  
+}
+.myLocation{
+    margin: 20px
+}
+.optionsArea{
+    width: 30%;
+    height:100%;
+    background-color: whitesmoke;
+    -webkit-box-shadow: -3px 0px 5px 0px rgba(0,0,0,0.75);
+        -moz-box-shadow: -3px 0px 5px 0px rgba(0,0,0,0.75);
+        box-shadow: -3px 0px 5px 0px rgba(0,0,0,0.75);
+        overflow-y: scroll;
+        /* z-index: 1000; */
+}
+.findMe:hover{
+    text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #009de6, 0 0 40px #009de6, 0 0 50px #009de6, 0 0 60px #009de6, 0 0 70px #009de6;
+    -webkit-text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #009de6, 0 0 40px #009de6, 0 0 50px #009de6, 0 0 60px #009de6, 0 0 70px #009de6;
+
+}
+.suggestionBox,.meeting-suggestions{
+position: relative;
+width: 100%;
+
+}
+.journey-disp{
+    width: 100%;
+    
+}
+.journey-graph{
+    width: 100%;
+    height: 160px;
+    /* border: 1px grey solid; */
+    margin: 10px;
+    margin-bottom: 20px;
+    padding: 10px;
+}
+
+.suggestions,.meeting-sug{
+position: absolute;
+z-index:10;
+background-color: wheat;
+padding: 10;
+width:100%;
+max-height: 500px;
+overflow-y: scroll;
+}
+.profiles-online label{
+    font-size: 10px;
+}
+.profiles-online img{
+   border:2px rgb(81, 255, 0) solid
+}
+#ping_dot{
+    
+        width: 10px;
+        height: 10px;
+        position: absolute;
+        text-decoration: none;
+        background-color: #77d2ff;
+        border-radius: 55px;
+        border: dotted 3px;
+        -moz-animation-duration: .75s;
+        -webkit-animation-duration: .75s;
+        -moz-animation-name: breathe;
+        -webkit-animation-name: breathe;
+        animation-iteration-count: infinite;
+        /* W3C and Opera */
+        -moz-animation-iteration-count: infinite;
+        /* Firefox */
+        -webkit-animation-iteration-count: infinite;
+        /*Safari and Chrome*/
+        animation-direction:alternate;
+        /* W3C and Opera */
+        -moz-animation-direction:alternate;
+        /* Firefox */
+        -webkit-animation-direction:alternate;
+        /* Safari and Chrome */
+        animation-delay:0s;
+        /* W3C and Opera */
+        -moz-animation-delay:0s;
+        /* Firefox */
+        -webkit-animation-delay:0s;
+        /* Safari and Chrome */
+    
+}
+.ping-container {
+        /* float: left; */
+        display: block;
+        width: 100px;
+        height: 100px;
+        /* margin: 100px; */
+        position: relative;
+}
+.mapOverlay{
+    
+    width: 250px;
+    height: 250px;
+    position: fixed;
+    z-index: 1000;
+    display: none;
+    left: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.56);
+    color:white;
+    padding: 20px
+}
+#pcontrol-unit{
+    width: 80%;
+    padding: 15px;
+    margin: 10px;
+    border-radius: 15px;
+    background-color: white;
+    -webkit-box-shadow: 0px 0px 6px 4px rgba(171,171,171,0.7);
+        -moz-box-shadow: 0px 0px 6px 4px rgba(171,171,171,0.7);
+        box-shadow: 0px 0px 6px 4px rgba(171,171,171,0.7);
+}
+#undo:hover{
+    color: rgb(215, 248, 215);
+}#redo:hover{
+    color: rgb(243, 200, 200)
+}
+#loadNew{
+    width: 60px;
+    height: 80px;
+    position: relative;
+    margin: 20px;
+    text-align: center;
+}
+#loadInput{
+    width: 60px;
+    height: 80px;
+    font-size: 12px;
+    border: 2px grey dashed;
+    background-color: transparent;
+    position: absolute;
+    z-index: 1;
+    margin-left: -21px;
+}
+
+#ubox{
+    border: 1px rgb(25, 150, 228) solid;
+    overflow: hidden;
+    padding: 10px;
+    margin: 0 15px;
+    cursor: pointer;position: relative;
+}
+#loadInput:hover{
+    color: green;
+    border-color: green;
+    border-style: dotted;
+    cursor: pointer;
+}
+#ubox:hover, .overlay{
+    cursor: pointer;
+    background-color: rgba(211, 210, 210, 0.226);
+    opacity: 1;
+}
+#icon-box{
+    width:100%;
+    height:150px;
+    border: 1px rgb(25, 150, 228) solid;
+    padding: 10px;
+  
+    cursor: pointer;
+}
+#icon-h{
+    margin: 8px;
+}
+#icon-h:hover{
+    cursor: pointer;
+}
+.grow {
+    transition: all .2s ease-in-out;
+}
+.grow:hover {
+    transform: scale(1.1);
+    cursor: pointer;
+}
+.listtile:hover{
+    background-color: rgba(219, 219, 219, 0.712);
+}
+#screenshot{
+    height:400px;
+    width: 400px;
+    object-fit: contain;
+    border: 1px, grey dashed;
+
+
+}
+.circleBtn{
+    border-radius: 10em;
+    margin: 8px;
+    padding: 8px;
+    text-align: center;
+}
+.dashedBorder{
+    border: 1px green dashed;
+}
