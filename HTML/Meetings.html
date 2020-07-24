@@ -135,11 +135,11 @@
               <div class="suggestionBox">
                   <div class="suggestions left-col list-group"></div>
                 </div>
-              <div class="myLocation text-center">
+              <!-- <div class="myLocation text-center">
                   
                   <h6><i class="fas fa-map-marker-alt grow findMe"></i>  My Location</h6>
                     <h6 id="myLocation"></h6>
-                </div>
+                </div> -->
              
               <label class="text-center">-- Tap Events -- </label>
   
@@ -152,21 +152,26 @@
                     <input type="radio" id="pdrawer" value=pdrawer name="map-mode" class="custom-control-input">
                     <label class="custom-control-label" for="customRadio1">Polyline Drawer</label>
                   </div>
-                  <div id="pcontrol-unit" class="col">
+                  <div id="pcontrol-unit" style="display:none" class="col">
                     <div class="centered-row"><button class="btn btn-secondary" id="resetPoly">Reset</button></div>
                     <label>Name</label>
                     <input type="text" class="form-control" id="journeyTitle" placeholder="Enter Journey title">
                     <label>Color</label>
-                    <div class="space-between-row" style="height: 80px;">
+                    <div class="space-between-row" style="">
                       <div class="m-2; " style="width: 30px; height: 30px; border-radius: 10px; border: 2px grey solid;" id="pcolor-sample"></div> 
                       <p><input type="text" id="pColor"></p></div>
+                      <div class="left-row" id="nodeBox" style="height:60px; display:none">
+                        <div class="circleBtn glow grow text-center nodeBtns" style="border: 1px rgb(0, 140, 255) solid" id="nodeAdder"><i class="fas fa-route" style="font-size: 20px;"></i></div>
+                        <div id="nodeBox-inner" class=space-between-row> </div>
+                      
+                      </div>
                       <div class="space-between-row"><button class="btn btn-danger " id="recBtn">Record Path</button>
                       <small style="color: red;display:none"id="recLbl">recording...</small>
                       <div class="space-between-row">
                         <i class="fa fa-reply mx-2" style="color: lightcoral;font-size: 20px;cursor: pointer;display: none;"id="undo"></i>
                         <i class="fa fa-share mx-2" style="color: lightgreen;font-size: 20px;cursor: pointer;display: none;" id="redo"></i>
                       </div></div><br>
-
+                     
                       <small class="text-center" id="drawerHelp"></small>
                       <div id="pathList" class=" left-col"></div>
                       <div class="form-check">
@@ -176,8 +181,8 @@
                         </label>
                       </div>
                       <div class="space-between-row;display:none" id="saveTypes" style="padding: 20px;">
-                        <button id=saveBtn class="btn btn-primary">Save</button>
-                        <button id=saveAsBtn class="btn btn-primary">Save JSON</button>
+                        <button id=saveBtn class="btn btn-primary">Save File</button>
+                        <!-- <button id=saveAsBtn class="btn btn-primary">Save JSON</button> -->
                       </div>
                      
                    

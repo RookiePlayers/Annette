@@ -145,7 +145,7 @@ function drawPolylines(event) {
             "lng":event.latLng.lng(),
             "id":path.getLength()
         });
-        updateList();
+        //updateList();
         if(!disableGraph)setTimeout(drawElavatorGraphforPath({"paths":Lnglatadapter(temp),"name":Journey.name,"key":Journey.key,"color":Journey.color,"return":Journey.return}),1200)
         
     }
@@ -157,6 +157,14 @@ function drawPolylines(event) {
           temp.push({lat:t.lat(),lng:t.lng()})
       })
       return temp;
+  }
+  function LngLatReverse(list) {
+    var temp=[];
+    list.forEach(t=>{
+        temp.push(new google.maps.LatLng(t.lat,t.lng))
+    })
+    return temp;
+    
   }
   function drawPolyLinesFromStored(){
     
@@ -171,42 +179,63 @@ function drawPolylines(event) {
         
   
 }
+//iterating through a list of nodes 
+//this is an array of the objects {journey, id}
 for (const [k, v] of Object.entries(JourneyView)) {
         console.log(v,k)
          if(v==true){
-            
+               NodePath=[];
+               poly.setMap(null);
+            Journeys[k-1].forEach(np=>{
+                console.log(np.journey)
             var newpoly = new google.maps.Polyline({
-                path:Journeys[k-1].paths,
-                strokeColor:Journeys[k-1].color,
+                path:np.journey.paths,
+                strokeColor:np.journey.color,
                 strokeOpacity: 1.0,
                // editable: true,
                 strokeWeight: 3,
                
              });
-             poly.setMap(null);
+             np['polyline']=newpoly;
              
-              poly.setPath(Journeys[k-1].paths);
-              poly.setOptions({strokeColor:Journeys[k-1].color});
+             
+              poly.setPath(np.journey.paths);
+              poly.setOptions({strokeColor:np.journey.color});
               
-              updateListV2(Journeys[k-1].paths);
+             
+              Journey=np.journey;
+             
+            updateListV2(Journey.paths);
+             $('#nodeBox').show();
+            currentNode=np.id;  
+
+             
+
               
-              drawElavatorGraphforPath(Journeys[k-1])
-              $("#journeyTitle").val(Journeys[k-1].name)
-              document.getElementById("journey-type").value=Journeys[k-1].return
+              
+              $("#journeyTitle").val(np.journey.name)
+              document.getElementById("journey-type").value=np.journey.return
             
             newpoly.setMap(map);
             tempPolylineHolder.push(newpoly);
-            Journey.name=Journeys[k-1].name;
-            Journey.color=Journeys[k-1].color;
-            Journey.key=Journeys[k-1].key;
-            Journey.return=Journeys[k-1].return;
-            Journey.paths=Lnglatadapter(Journeys[k-1].paths);
+
+            //TODO: update journey ui
+            NodePath.push(np);
+              updateNodeElem();
+
+            // Journey.name=Journeys[k-1].name;
+            // Journey.color=Journeys[k-1].color;
+            // Journey.key=Journeys[k-1].key;
+            // Journey.return=Journeys[k-1].return;
+            // Journey.paths=Lnglatadapter(Journeys[k-1].paths);
+
          
-            if(Journeys[k-1].paths.length>2){
+            if(np.journey.paths.length>2&&np.journey.key=="trials-main"){
                console.log("here")
-               Journeys[k-1].return==true? addMarker(Journeys[k-1].paths[Journeys[k-1].paths.length-1].lat(),Journeys[k-1].paths[Journeys[k-1].paths.length-1].lng(),Journeys[k-1].name+"--end",):addMarker(Journeys[k-1].paths[0].lat(),Journeys[k-1].paths[0].lng(),Journeys[k-1].name+"--end",destinationIcon);
-                    addMarker(Journeys[k-1].paths[Journeys[k-1].paths.length-1].lat(),Journeys[k-1].paths[Journeys[k-1].paths.length-1].lng(),Journeys[k-1].name+"--start",);
+              np.journey.return==true? addMarker(np.journey.paths[np.journey.paths.length-1].lat(),np.journey.paths[np.journey.paths.length-1].lng(),np.journey.name+"--end",):addMarker(np.journey.paths[0].lat(),np.journey.paths[0].lng(),np.journey.name+"--end",destinationIcon);
+                    addMarker(np.journey.paths[np.journey.paths.length-1].lat(),np.journey.paths[np.journey.paths.length-1].lng(),np.journey.name+"--start",);
                 }
+             })
          }
      }
     
@@ -261,12 +290,17 @@ function updateList(){
     Journey.paths.reverse();
      // Add a new marker at the new plotted point on the polyline.
    var i=0;
+   if(Journey.paths.length>0)
+   if (Journey.paths[0].id ==undefined){
+       console.log(Journey.paths,"--tyoe");
+            updateListV2(Journey.paths);
+   }else{
     Journey.paths.forEach((path)=>{
         var label= new HLabel(`${path.id}) ${convertDMS(path.lat,path.lng)}`,'','',new FontSetting("12px", "black"));
         $("#pathList").append(label.getDiv());
       
     });
-    
+   }
    
    
     
@@ -281,6 +315,7 @@ function updateListV2(paths){
    
     paths.forEach((path)=>{
       
+      console.log(path);
         var label= new HLabel(`${i--}) ${convertDMS(path.lat(),path.lng())}`,'','',new FontSetting("12px", "black"));
         $("#pathList").append(label.getDiv());
       
@@ -569,11 +604,34 @@ function initUI() {
           $('newBtn').attr('disabled',false)
         });
       $('#importBtn').on('click',()=>{
-          importProject();
+         importProject();
         });
         $('#exportPngBtn').on('click',()=>{
-            exportAsPng();
+           // exportAsPng();
+            gf();
         })
+        $('#nodeAdder').on('click',()=>{
+         
+            currentNode++;
+            Journey.paths=[];
+          //  poly.setPath(LngLatReverse(Journey.paths));
+           
+           var temp = new google.maps.Polyline({
+                    path:[],
+                    strokeColor:activeColor,
+                   strokeOpacity: 1.0,
+                    strokeWeight: 3,
+                   
+              });
+              poly=temp;
+              poly.setMap(map)
+            //updateList();
+             NodePath.push({"journey": JSON.parse(JSON.stringify(Journey)),"id":currentNode,"polyline":temp});
+            updateNodeElem();
+        });
+        $("#findMe").on("click",()=>{
+
+        });
    
 }
 function updateUserLocation(profile){
@@ -710,6 +768,8 @@ var WayPointsView={};
 var uploadedFiles=[];//TODO
 var checkpoints=[];//TODO
 var lockRatio=false;
+var NodePath=[{}];
+var currentNode=0;
 
 var Journey={
     "name":"",
@@ -749,14 +809,39 @@ function  updatePolylines(){
 }
 
 function parseFile(txt=""){
+   
     console.log(txt);
     searchRegExp = /\\n/g;
     txt=txt.replace(searchRegExp,"\n")
+    console.log(txt); 
+    var sections=txt.split("-- Path End --");
+   var newNodePath=[];
+   var i=0;
+   if(sections.length>0){
+       console.log(sections,"sections");
+   sections.forEach(sec=>{
+       if(i<sections.length-1)
+       newNodePath.push(
+           {"journey": parseFileJourney(sec),"id":i++}
+       );
+   })
+    console.log(newNodePath);
+  
+    Journeys.push(newNodePath);
+    JourneyIndex++;
+    }else{
+        alert("invalid File uploaded")
+    }
+}
+function parseFileJourney(txt){
+    var searchRegExp = /\\n/g;
+    txt=txt.replace(searchRegExp,"\n").trim();
     console.log(txt);
     var lines=txt.split("\n");
     var paths=[];
+    console.log(lines);
     
-    if(lines[0].split(",").length>3){
+   
         for(i=0;i<Number(lines[0].split(",")[2]);i++){
        // paths.push({"id":lines[i+1].split(",")[0],"lat":lines[i+1].split(",")[1],"lng":lines[i+1].split(",")[2]});
       var myLatLng = new google.maps.LatLng({lat: Number(lines[i+1].split(",")[1]), lng: Number(lines[i+1].split(",")[2])}); 
@@ -768,15 +853,11 @@ function parseFile(txt=""){
         "color":lines[0].split(",")[1],
         "paths":paths,
         "return":lines[0].split(",")[3],
-    }
-   
-    console.log(journey);
+        "key":lines[0].split(",")[4]
+    }  
     journey.paths.sort(compare);
    journey.paths.reverse();
-    Journeys.push(journey);
-    JourneyIndex++;}else{
-        alert("invalid File uploaded")
-    }
+   return journey;
 }
 function parseJson(txt=""){
     console.log(txt);
@@ -855,8 +936,47 @@ function waypointsetup(){
 
 })
 }
+function addNodePath(){
+    if( NodePath.length>0){
+        NodePath[currentNode].journey=JSON.parse(JSON.stringify(Journey));
+        NodePath[currentNode].polyline=poly;
+        
+       
+        updateNodeElem();
+    }
+}
+function updateNodeElem(){
+    $('#nodeBox-inner').html('');
+    var i=0;
+    console.log(NodePath);
+    NodePath.forEach((node)=>{
+        var cont= new Center('circleBtn bordered grow nodeBtns');
+        cont.setHeight("40px");
+        cont.setWidth("40px");
+        console.log("Node: ",currentNode,i);
+        if(currentNode==i){
+            cont.getDiv().style.backgroundColor="rgba(88, 174, 255, 0.541)"
+        }
+        var lbl= new HLabel(i+1,"","",new FontSetting("14px",node.journey!=undefined? node.journey.color:NodePath[i].journey!=undefined?NodePath[i].journey.color:activeColor,"Helvetica","bold"));
+        cont.add(lbl.getDiv())
+        $('#nodeBox-inner').append(cont.getDiv());
+        i++;
+       if(node.journey!=undefined)drawElavatorGraphforPath(node.journey)
+        cont.onClick(()=>{
+            
+            Journey=node.journey;
+            
+            poly=node.polyline
+            updateList();
+            currentNode=node.id;  
+            drawElavatorGraphforPath(Journey)
+           updateNodeElem();
+        })
+    })
+}
 function initMap() {
     loadIcons();
+    updateNodeElem();
     $('#lock_ratio').on('click',()=>{
         if(lockRatio){
             document.getElementById("lock_ratio").classList.remove("fa-lock");
@@ -929,6 +1049,9 @@ function initMap() {
                     isPaused=true;
                     $("#recLbl").hide();
                     $("#recBtn").show();
+                    $('#nodeBox').show();
+                   
+                    addNodePath();
                 //     var temp=poly.getPath();
                 //     poly.setMap(null);
                 //     poly = new google.maps.Polyline({
@@ -940,21 +1063,30 @@ function initMap() {
                 //   });
             
                 //   poly.setMap(map);
+                 if(NodePath[0].journey.paths.length>2){
+                        console.log("lenght - "+Journey.paths.length);
+                        addMarker(NodePath[0].journey.paths[0].lat,NodePath[0].journey.paths[0].lng,"end",destinationIcon);
+                        addMarker(NodePath[0].journey.paths[NodePath[0].journey.paths.length-1].lat,NodePath[0].journey.paths[NodePath[0].journey.paths.length-1].lng,"start",);
+                        console.log(markers)
+                   }
                 poly.setEditable(false)
                     endThread();
                     var i=0;
-                    if(Journey.paths.length>2){
-                        console.log("lenght - "+Journey.paths.length);
-                        addMarker(Journey.paths[0].lat,Journey.paths[0].lng,"end",destinationIcon);
-                        addMarker(Journey.paths[Journey.paths.length-1].lat,Journey.paths[Journey.paths.length-1].lng,"start",);
-                        console.log(markers)
-                   }
+                   
                 });
                 $("#recBtn").on('click',()=>{
                     removeMarker("start");
+                    $('#nodeBox').hide();
                     removeMarker("end");
-                    
+                    console.log(NodePath);
+                     NodePath[currentNode]={
+                         journey:{},
+                         id:currentNode
+                     }
+                     
                     if(!isPaused){
+
+                        
                         var temp=poly.getPath();
                         poly.setMap(null);
                         poly = new google.maps.Polyline({
@@ -965,8 +1097,11 @@ function initMap() {
                         strokeWeight: 3,
                        
                      });
-                    
-                      poly.setMap(map);}
+
+                     //poly.setPath(LngLatReverse(Journey.paths));
+                      poly.setMap(map);
+                     
+                    }
                        poly.setEditable(true)
                       google.maps.event.addListener(poly, "rightclick", function(e) {console.log("delete");
                       if (e.vertex == undefined) {
@@ -1012,7 +1147,7 @@ function initMap() {
         
                 })
                 $('#saveBtn').on('click',()=>{
-                     download(dataToString(),`${Journey.name}.txt`,'text');
+                     download(nodeDataToString(),`${Journey.name}.txt`,'text');
                      reset();
                 })
                 $('#saveAsBtn').on('click',()=>{
@@ -1074,25 +1209,40 @@ var distances=[];
       var points=[];
        distances=[];
        var i=0;
-       if(journey.return==true){
-          //console.log("journey: "+journey.return);
-      var temp=journey.paths;
+    //    if(journey.return==true){
+    //       //console.log("journey: "+journey.return);
+    //   var temp=journey.paths;
      
-      console.log(temp,journey.paths);
-     // temp.reverse();
-      var newarr=journey.paths.concat(temp)
-      journey.paths=newarr;
-      console.log(temp,journey.paths);
-    }
+    //   console.log(temp,journey.paths);
+    //  // temp.reverse();
+    //   var newarr=journey.paths.concat(temp)
+    //   journey.paths=newarr;
+    //   console.log(temp,journey.paths);
+    // }
       
       journey.paths.forEach(path=>{
       //  distances.push(calcDistance({lat:journey.paths[0].lat(),lng:journey.paths[0].lng()},{lat:path.lat(),lng:path.lng()}))
-        var  curD=calcDistance({lat:journey.paths[i==0?0:i-1].lat(),lng:journey.paths[i==0?0:i-1].lng()},{lat:path.lat(),lng:path.lng()});//
+        var  curD=0;
+      try {
+        curD=calcDistance({lat:journey.paths[i==0?0:i-1].lat(),lng:journey.paths[i==0?0:i-1].lng()},{lat:path.lat(),lng:path.lng()});//
+      } catch (error) {
+          console.log('switching latlng format');
+          
+      }finally{
+            curD=calcDistance({lat:journey.paths[i==0?0:i-1].lat,lng:journey.paths[i==0?0:i-1].lng},{lat:path.lat,lng:path.lng});//
+      }
+        
         var oldD=distances.length>1?distances[distances.length-1]:0;
         console.log(curD,oldD,curD+oldD);
         distances.push(curD+oldD);
-
-        points.push( new google.maps.LatLng({lat:path.lat(),lng:path.lng()}));
+        try {
+             points.push( new google.maps.LatLng({lat:path.lat(),lng:path.lng()}));
+        } catch (error) {
+            
+        }
+        finally{
+              points.push( new google.maps.LatLng({lat:path.lat,lng:path.lng}));
+        }
         i++;
       })
     
@@ -1194,6 +1344,11 @@ var distances=[];
                     poly.setMap(null);
     poly.setPath([]);
     updateList();
+    NodePath.forEach(node=>{
+        node.polyline.setMap(null)
+    })
+    NodePath=[];
+    updateNodeElem();
     removeMarker("end");
     removeMarker("start");
 
@@ -1341,13 +1496,31 @@ function endThread(params) {
 const momento= function(){
     this
 };
-function dataToString(){
+//
+//
+//deprecated
+function dataToString(journey){
     var paths="";
-    Journey.paths.reverse();
-    Journey.paths.forEach(path=>{
+    journey.paths.reverse();
+    journey.paths.forEach(path=>{
         paths+=`${path.id},${path.lat},${path.lng}\n`
     })
-    return `${Journey.name},${activeColor},${Journey.paths.length},${Journey.return},${Journey.key}\n${paths}`;
+    return `${journey.name},${journey.color},${journey.paths.length},${journey.return},${journey.key}\n${paths}`;
+}
+//
+//
+// use nodeDataToString
+function  nodeDataToString(){
+    var finalString="";
+    var i=0;
+   
+    NodePath.forEach(node=>{
+          if(i==0)node.journey.key=node.journey.key+"-main"
+        console.log(node,'-- journey');
+       finalString += dataToString(node.journey)+"-- Path End --\n";
+       i++;
+    });
+    return finalString;
 }
 //saving...
 function download(data, filename, type) {
@@ -1400,11 +1573,11 @@ function loadFileAsText(func, f='loadInput'){
             
             //       document.getElementById('result').value = formatted;
            func(formatted,n)
-           uploadedFiles.push(
-            {
-                filename:n,
-                data:JSON.stringify( formatted, null, 2)
-            })
+        //    uploadedFiles.push(
+        //     {
+        //         filename:n,
+        //         data:JSON.stringify( formatted, null, 2)
+        //     })
          }
         
     };
@@ -1552,7 +1725,7 @@ function updateLoadedFiles(text,ext){
         vbox.addAll([box.getDiv(),label2.getDiv()])
         label2.getDiv().style.textAlign="center"
         document.getElementById("loaded").appendChild(vbox.getDiv());
-        if(ext.includes("txt"))parseFile(text);else parseJson(text)
+        if(ext.includes("txt"))parseFile(text);//else parseJson(text)
         var n=JourneyIndex;
         JourneyView[`${n}`]=false;
         click(overlay)
@@ -1603,10 +1776,18 @@ function exportProject(){
             }
         )
     }
+    var nodes=[];
+    NodePath.forEach(n=>{
+        nodes.push({
+            'journey':n.journey,
+            'id':n.id
+        })
+    })
     var data={
         filename:"",
         polylineDrawer:{
-           currentJourney:Journey,
+           currentJourney:nodes,
+           currentNode:currentNode
         },
         uploadedFiles:uploadedFiles,
         checkpoints:{
@@ -1628,15 +1809,60 @@ function exportProject(){
             download(JSON.stringify(data),`${new Date().toLocaleDateString().replace(" ","_")}_project.json`,'octet/stream')
         }
 }
+window.onload = function() {
+    var reloading = localStorage.getItem("import");
+    if (reloading) {
+        localStorage.removeItem("import");
+        importProject();
+    }
+}
+
+function onimport() {
+    localStorage.setItem("import", "true");
+    document.location.reload();
+}
 function importProject(){
+   
+    uploadedFiles=[];
     console.log('importing');
     try {
         uploadFile(
             (txt,ext)=>{
                 var json=JSON.parse(txt);
                 moveToLocation(json.cameraFocus.lnglat.lat,json.cameraFocus.lnglat.lng);
-                map.setZoom(json.cameraFocus.zoom)
-                Journey=json.polylineDrawer.currentJourney;
+                map.setZoom(json.cameraFocus.zoom);
+                 currentNode=json.currentNode;
+
+                 NodePath=[];
+                 json.polylineDrawer.currentJourney.forEach(
+                     cj=>{
+                             
+                            var temp = new google.maps.Polyline({
+                                        path:[],
+                                        strokeColor:activeColor,
+                                    strokeOpacity: 1.0,
+                                        strokeWeight: 3,
+                                    
+                                });
+                                poly=temp;
+                                poly.setMap(map)
+                         NodePath.push(
+                             {
+                                 "journey":cj.journey,
+                                 "id":cj.id,
+                                 "polyline":temp
+                             }
+                         )
+                     }
+                 );
+                 Journey={
+                     name:"",
+                     color:activeColor,
+                     return:false,
+                 }
+                 if(json.polylineDrawer.currentJourney[currentNode]!=undefined)
+                Journey=json.polylineDrawer.currentJourney[currentNode];
+                updateNodeElem();
                 $('#journeyTitle').val(Journey.name)
                 $('#pColor').val(Journey.color)
                 document.getElementById("pcolor-sample").style.backgroundColor=Journey.color;
@@ -1650,6 +1876,8 @@ function importProject(){
                 
                 WayPoints=json.checkpoints.waypoints;
                 WayPointsView=json.checkpoints.waypointsView;
+               
+
                 icons=json.icons;
                 loadIcons();
                 waypointsetup()
